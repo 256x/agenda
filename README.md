@@ -10,6 +10,14 @@ A minimalist text-based agenda app with Git sync.
   &nbsp;<img src="https://img.shields.io/badge/Android-8%2B-blue">&nbsp;<img src="https://img.shields.io/badge/license-MIT-lightgrey">
 </p>
 
+<p>
+    <img width="180" alt="list Screen" src="https://github.com/user-attachments/assets/67b14d9a-361b-4a27-9a79-4375b0659579" />
+    <img width="180" alt="Agenda Detail Screen" src="https://github.com/user-attachments/assets/07b4b531-89c1-4be4-b1e8-6d2dc5d6aadf" />
+    <img width="180" alt="Calendar View Screen" src="https://github.com/user-attachments/assets/8ef89114-d8a3-403f-b2be-52c00fc9abe9" />
+    <img width="180" alt="Setting Screen" src="https://github.com/user-attachments/assets/b36310e3-2ecb-4b17-93eb-ea4958d153eb" />
+</p>
+
+
 [User Guide](./docs/USER_GUIDE.md)
 
 ## Why?

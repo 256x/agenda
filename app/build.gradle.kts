@@ -62,4 +62,5 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.icons.extended)
+    implementation("androidx.security:security-crypto:1.0.0")
 }

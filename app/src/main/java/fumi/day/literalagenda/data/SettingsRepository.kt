@@ -1,11 +1,14 @@
 package fumi.day.literalagenda.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import org.json.JSONObject
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,10 +23,20 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    private val encryptedPrefs: SharedPreferences = run {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        EncryptedSharedPreferences.create(
+            "secure_prefs",
+            masterKeyAlias,
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
     companion object {
         private val SHOW_MINI_CALENDAR = booleanPreferencesKey("show_mini_calendar")
         private val CONTROLS_ON_LEFT = booleanPreferencesKey("controls_on_left")
-        private val GITHUB_TOKEN = stringPreferencesKey("github_token")
         private val GITHUB_REPO = stringPreferencesKey("github_repo")
         private val BG_COLOR = stringPreferencesKey("bg_color")
         private val TEXT_COLOR = stringPreferencesKey("text_color")
@@ -42,7 +55,7 @@ class SettingsRepository @Inject constructor(
         .map { it[CONTROLS_ON_LEFT] ?: false }
 
     val githubToken: Flow<String> = context.dataStore.data
-        .map { it[GITHUB_TOKEN] ?: "" }
+        .map { encryptedPrefs.getString("github_token", "") ?: "" }
 
     val githubRepo: Flow<String> = context.dataStore.data
         .map { it[GITHUB_REPO] ?: "" }
@@ -88,7 +101,7 @@ class SettingsRepository @Inject constructor(
     }
 
     suspend fun setGitHubToken(token: String) {
-        context.dataStore.edit { it[GITHUB_TOKEN] = token }
+        encryptedPrefs.edit().putString("github_token", token).apply()
     }
 
     suspend fun setGitHubRepo(repo: String) {
