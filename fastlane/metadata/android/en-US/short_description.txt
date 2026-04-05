@@ -1,0 +1,1 @@
+A minimalist personal agenda app with iCal import and GitHub sync.
