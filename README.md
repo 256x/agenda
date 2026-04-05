@@ -38,7 +38,7 @@ Literal Agenda is built around a simple observation:
 
 **Work calendars are for work. Your private life deserves something quieter.**
 
-No recurring meeting management. No invites. No integrations.
+No shared calendars. No meeting invites. No integrations.
 
 Just your events, stored as plain text files, synced through a private GitHub repository you control.
 
@@ -65,16 +65,6 @@ repo/
 
 Each file is a plain text representation of a single event. No database. No proprietary format. Just files you can read, edit, or delete directly.
 
-## Why not Google Calendar?
-
-Because you don't need it for your personal life.
-
-Google Calendar is excellent for work — shared schedules, meeting rooms, video call links. Use it there.
-
-But for your private life, it's overkill. And you're handing your daily routine to a third party.
-
-Literal Agenda gives you a private, readable, searchable calendar that lives in a Git repo you own.
-
 ## Who is this for?
 
 This app may appeal to people who:
@@ -96,10 +86,6 @@ See [User Guide](./docs/USER_GUIDE.md) for details.
 Literal Agenda is not a calendar app trying to do less.
 
 It's a different idea of what a personal schedule should be.
-
-## Design Constraints
-
-This app is intentionally simple.
 
 If a feature requires explaining in multiple steps, it probably doesn't belong here.
 
