@@ -71,9 +71,9 @@ class EditViewModel @Inject constructor(
         _isSaving.value = true
 
         return try {
-            // Delete from remote first
+            // Move to remote trash first
             val isRepeating = event.repeat != RepeatType.NONE
-            gitHubRepository.deleteRemoteFile(event.filename, isRepeating)
+            gitHubRepository.moveToRemoteTrash(event.filename, isRepeating)
             
             // Delete from local
             val success = eventRepository.deleteEvent(event)

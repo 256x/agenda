@@ -106,6 +106,12 @@ When creating or editing an event, you can set a repeat type:
 - Manual sync available via the sync icon in the top bar
 - Each event is stored as a plain text file in your repository
 
+### Deleted Events
+
+When you delete an event, it is moved to a `trash/` folder in your GitHub repository instead of being permanently deleted. The app never reads from `trash/` — it is purely a safety net on the GitHub side.
+
+To permanently delete trashed events, remove the files from `trash/` directly in GitHub (or in a local clone) and sync.
+
 ### Multi-device Usage
 
 1. Set up GitHub Sync on all devices using the same repository
@@ -171,5 +177,5 @@ Imported events will appear in your list immediately.
 
 ### Lost an event?
 
-All changes are preserved in Git history. Go to your GitHub repository, find the file, and check its history to recover previous content.
+Deleted events are moved to the `trash/` folder in your GitHub repository. To restore one, move the file from `trash/` back to `events/` (or `repeating/` for repeating events) directly in GitHub, then sync the app.
 

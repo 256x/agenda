@@ -71,7 +71,7 @@ class GitHubRepository @Inject constructor(
     private val repeatingDir: File
         get() = File(context.filesDir, "repeating").also { it.mkdirs() }
 
-    private suspend fun makeRequest(
+private suspend fun makeRequest(
         method: String,
         url: String,
         token: String,
@@ -158,7 +158,7 @@ class GitHubRepository @Inject constructor(
             when {
                 localFile != null && remoteFile == null -> {
                     if (knownSha != null) {
-                        // Previously synced, now deleted on remote → delete locally
+                        // Previously synced, now gone from remote → delete locally
                         localFile.delete()
                         newShas.remove("$remotePath/$fileName")
                     } else {
@@ -315,7 +315,7 @@ class GitHubRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteRemoteFile(filename: String, isRepeating: Boolean): Boolean {
+    suspend fun moveToRemoteTrash(filename: String, isRepeating: Boolean): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val token = settingsRepository.githubToken.first()
@@ -327,6 +327,8 @@ class GitHubRepository @Inject constructor(
                 val remoteFiles = listFilesInDir(token, repo, dir)
                 val remoteFile = remoteFiles.find { it.name == filename } ?: return@withContext true
 
+                val content = getFileContent(token, repo, remoteFile.path) ?: return@withContext false
+                putFile(token, repo, "trash/$filename", content, null)
                 deleteFile(token, repo, "$dir/$filename", remoteFile.sha)
             } catch (e: Exception) {
                 false

@@ -50,7 +50,9 @@ Events are stored as plain text files in a simple directory:
 
 ```
 repo/
-└── events/    ← one file per event
+├── events/      ← one file per event
+├── repeating/   ← repeating events
+└── trash/       ← deleted events (kept for recovery)
 ```
 
 Each file is a plain text representation of a single event. No database. No proprietary format. Just files you can read, edit, or delete directly.

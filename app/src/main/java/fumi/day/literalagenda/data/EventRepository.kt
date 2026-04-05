@@ -25,7 +25,7 @@ class EventRepository @Inject constructor(
     private val repeatingDir: File
         get() = File(context.filesDir, "repeating").also { it.mkdirs() }
 
-    private val _events = MutableStateFlow<List<Event>>(emptyList())
+private val _events = MutableStateFlow<List<Event>>(emptyList())
     val events: Flow<List<Event>> = _events
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
