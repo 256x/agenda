@@ -42,7 +42,9 @@ private val _events = MutableStateFlow<List<Event>>(emptyList())
                 ?.mapNotNull { parseEventFile(it, true) }
                 ?: emptyList()
 
-            _events.value = (singleEvents + repeatingEvents).sortedBy { it.date }
+            _events.value = (singleEvents + repeatingEvents)
+                .distinctBy { it.filename }
+                .sortedBy { it.date }
         }
     }
 
@@ -98,6 +100,8 @@ private val _events = MutableStateFlow<List<Event>>(emptyList())
         return withContext(Dispatchers.IO) {
             try {
                 val dir = if (event.repeat == RepeatType.NONE) eventsDir else repeatingDir
+                val otherDir = if (event.repeat == RepeatType.NONE) repeatingDir else eventsDir
+                File(otherDir, event.filename).delete()
                 val file = File(dir, event.filename)
                 file.writeText(eventToMarkdown(event))
                 loadEvents()

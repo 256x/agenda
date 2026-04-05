@@ -1,14 +1,11 @@
 package fumi.day.literalagenda.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import org.json.JSONObject
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,17 +20,6 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val encryptedPrefs: SharedPreferences = run {
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        EncryptedSharedPreferences.create(
-            "secure_prefs",
-            masterKeyAlias,
-            context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
-
     companion object {
         private val SHOW_MINI_CALENDAR = booleanPreferencesKey("show_mini_calendar")
         private val CONTROLS_ON_LEFT = booleanPreferencesKey("controls_on_left")
@@ -46,6 +32,7 @@ class SettingsRepository @Inject constructor(
         private val DATE_FORMAT = stringPreferencesKey("date_format")
         private val LAST_SYNCED_AT = longPreferencesKey("last_synced_at")
         private val LAST_SYNCED_SHAS = stringPreferencesKey("last_synced_shas")
+        private val GITHUB_TOKEN = stringPreferencesKey("github_token")
     }
 
     val showMiniCalendar: Flow<Boolean> = context.dataStore.data
@@ -55,7 +42,7 @@ class SettingsRepository @Inject constructor(
         .map { it[CONTROLS_ON_LEFT] ?: false }
 
     val githubToken: Flow<String> = context.dataStore.data
-        .map { encryptedPrefs.getString("github_token", "") ?: "" }
+        .map { it[GITHUB_TOKEN] ?: "" }
 
     val githubRepo: Flow<String> = context.dataStore.data
         .map { it[GITHUB_REPO] ?: "" }
@@ -101,7 +88,7 @@ class SettingsRepository @Inject constructor(
     }
 
     suspend fun setGitHubToken(token: String) {
-        encryptedPrefs.edit().putString("github_token", token).apply()
+        context.dataStore.edit { it[GITHUB_TOKEN] = token }
     }
 
     suspend fun setGitHubRepo(repo: String) {

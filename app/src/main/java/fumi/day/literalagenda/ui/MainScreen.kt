@@ -234,7 +234,7 @@ fun MainScreen(
             } else {
                 LazyColumn(state = listState, modifier = Modifier.weight(1f).fillMaxWidth()) {
                     item { Spacer(modifier = Modifier.height(8.dp)) }
-                    itemsIndexed(displayedEvents, key = { _, event -> "${event.filename}_${event.date}" }) { index, event ->
+                    itemsIndexed(displayedEvents, key = { index, event -> "${event.filename}_${event.date}_$index" }) { index, event ->
                         EventItem(event = event, dateFormat = dateFormat, isOdd = index % 2 == 0, onClick = { onNavigateToEdit(event) })
                     }
                     item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -293,9 +293,11 @@ private fun EventItem(event: Event, dateFormat: String, isOdd: Boolean, onClick:
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = dateText, style = bodyStyle.copy(fontFamily = FontFamily.Monospace, lineHeight = bodyStyle.lineHeight), color = MaterialTheme.colorScheme.onBackground)
-        event.time?.let { time ->
-            Text(text = time.format(timeFormatter), style = bodyStyle.copy(fontFamily = FontFamily.Monospace, lineHeight = bodyStyle.lineHeight), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+        Text(
+            text = event.time?.format(timeFormatter) ?: "--:--",
+            style = bodyStyle.copy(fontFamily = FontFamily.Monospace, lineHeight = bodyStyle.lineHeight),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(text = event.title, style = bodyStyle.copy(lineHeight = bodyStyle.lineHeight), color = MaterialTheme.colorScheme.onBackground, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
     }
 }

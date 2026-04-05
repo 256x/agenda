@@ -25,6 +25,13 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val events: Flow<List<Event>> = eventRepository.getUpcomingEvents()
+
+    private val _selectedEvent = MutableStateFlow<Event?>(null)
+    val selectedEvent: StateFlow<Event?> = _selectedEvent
+
+    fun selectEvent(event: Event?) {
+        _selectedEvent.value = event
+    }
     val showMiniCalendar: Flow<Boolean> = settingsRepository.showMiniCalendar
     val controlsOnLeft: Flow<Boolean> = settingsRepository.controlsOnLeft
     val dateFormat: Flow<String> = settingsRepository.dateFormat
