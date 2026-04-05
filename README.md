@@ -6,7 +6,7 @@ A minimalist text-based agenda app with Git sync.
 
 <p>
   <a href="https://github.com/256x/agenda/releases/latest"><img src="https://img.shields.io/github/v/release/256x/agenda?label=GitHub%20Release"></a>
-  <!-- -->&nbsp;<a href="https://apt.izzysoft.de/packages/fumi.day.literalagenda"><img src="https://img.shields.io/badge/IzzyOnDroid-download-brightgreen"></a> -->
+  <!-- &nbsp;<a href="https://apt.izzysoft.de/packages/fumi.day.literalagenda"><img src="https://img.shields.io/badge/IzzyOnDroid-download-brightgreen"></a> -->
   &nbsp;<img src="https://img.shields.io/badge/Android-8%2B-blue">&nbsp;<img src="https://img.shields.io/badge/license-MIT-lightgrey">
 </p>
 
