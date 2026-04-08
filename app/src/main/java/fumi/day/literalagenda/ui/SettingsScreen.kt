@@ -123,25 +123,13 @@ fun SettingsScreen(
         syncError?.let { viewModel.clearSyncError() }
     }
 
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let { selectedUri ->
             val inputStream = context.contentResolver.openInputStream(selectedUri)
             inputStream?.let { viewModel.importICal(it) }
-        }
-    }
-
-    val filePickerLauncherReal = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { selectedUri ->
-            scope.launch {
-                try {
-                    // We need context to open the stream, so we pass the uri to viewModel indirectly
-                } catch (e: Exception) { }
-            }
         }
     }
 
@@ -323,7 +311,6 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "Literal Agenda v1.0.0",
                 style = MaterialTheme.typography.labelSmall,
@@ -401,17 +388,23 @@ fun SettingsScreen(
                         enabled = !isSyncing,
                         modifier = Modifier.fillMaxWidth()
                     )
+                    val repoValid = repoInput.matches(Regex("^[^/]+/[^/]+$"))
                     OutlinedTextField(
                         value = repoInput,
                         onValueChange = { repoInput = it },
                         label = { Text("Repository (owner/repo)") },
                         singleLine = true,
+                        isError = repoInput.isNotBlank() && !repoValid,
+                        supportingText = if (repoInput.isNotBlank() && !repoValid) {
+                            { Text("Format: owner/repo") }
+                        } else null,
                         enabled = !isSyncing,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             },
             confirmButton = {
+                val repoValid = repoInput.matches(Regex("^[^/]+/[^/]+$"))
                 TextButton(
                     onClick = {
                         scope.launch {
@@ -419,7 +412,7 @@ fun SettingsScreen(
                             if (success) showGitHubDialog = false
                         }
                     },
-                    enabled = !isSyncing && tokenInput.isNotBlank() && repoInput.isNotBlank()
+                    enabled = !isSyncing && tokenInput.isNotBlank() && repoValid
                 ) {
                     Text("Connect")
                 }

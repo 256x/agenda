@@ -80,11 +80,7 @@ Tap the calendar icon in the top bar to toggle the mini calendar.
 
 When creating or editing an event, you can set a repeat type:
 
-- **None**: One-time event
-- **Daily**: Repeats every day
-- **Weekly**: Repeats every week
-- **Monthly**: Repeats every month
-- **Yearly**: Repeats every year
+- **Weekly** / **Monthly** / **Yearly**
 
 ---
 
@@ -102,7 +98,7 @@ When creating or editing an event, you can set a repeat type:
 
 ### How Sync Works
 
-- Syncs automatically on app launch
+- Syncs automatically on app launch and each time the app returns to the foreground
 - Manual sync available via the sync icon in the top bar
 - Each event is stored as a plain text file in your repository
 
@@ -120,7 +116,7 @@ To permanently delete trashed events, remove the files from `trash/` directly in
 
 ### Conflict Resolution
 
-If the same event is edited on two devices before syncing, the device that syncs first wins. All changes are preserved in Git history.
+If the same event is edited on two devices before syncing, the remote version wins. The local version is saved as a separate file (`filename_conflict_YYYYMMDD_HHmmss.md`) on the device, so no changes are lost.
 
 ---
 

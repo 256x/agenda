@@ -60,4 +60,3 @@ fun getTypography(fontChoice: String, fontSize: Float = 16f): Typography {
     )
 }
 
-val Typography = getTypography("system", 16f)

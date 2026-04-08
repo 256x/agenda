@@ -26,7 +26,6 @@ class EventRepository @Inject constructor(
         get() = File(context.filesDir, "repeating").also { it.mkdirs() }
 
 private val _events = MutableStateFlow<List<Event>>(emptyList())
-    val events: Flow<List<Event>> = _events
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
 
@@ -159,24 +158,12 @@ private val _events = MutableStateFlow<List<Event>>(emptyList())
                     val file = File(dir, event.filename)
                     file.writeText(eventToMarkdown(event))
                     count++
-                    // Small delay to ensure unique filenames
-                    Thread.sleep(10)
                 }
 
                 loadEvents()
                 count
             } catch (e: Exception) {
                 0
-            }
-        }
-    }
-
-    fun searchEvents(query: String): Flow<List<Event>> {
-        val lowerQuery = query.lowercase()
-        return _events.map { events ->
-            events.filter {
-                it.title.lowercase().contains(lowerQuery) ||
-                        it.note.lowercase().contains(lowerQuery)
             }
         }
     }

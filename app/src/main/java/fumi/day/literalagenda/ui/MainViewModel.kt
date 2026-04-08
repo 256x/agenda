@@ -69,12 +69,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun loadEvents() {
-        viewModelScope.launch {
-            eventRepository.loadEvents()
-        }
-    }
-
     fun syncAndLoad() {
         viewModelScope.launch { eventRepository.loadEvents() }
         gitHubRepository.launchSync()

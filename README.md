@@ -48,7 +48,7 @@ Just your events, stored as plain text files, synced through a private GitHub re
 - **Mini calendar**: Optional month view with event indicators
 - **Sync**: GitHub sync to keep events across devices
 - **Import**: Import from any iCal-compatible calendar app (.ics)
-- **Repeat**: Daily, weekly, monthly, and yearly repeat support
+- **Repeat**: Weekly, monthly, and yearly repeat support
 - **Search**: Filter events by title or note
 - **Customize**: Font, size, accent color, controls on left
 

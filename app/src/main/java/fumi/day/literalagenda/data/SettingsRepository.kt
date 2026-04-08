@@ -1,16 +1,23 @@
 package fumi.day.literalagenda.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import org.json.JSONObject
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,7 +39,29 @@ class SettingsRepository @Inject constructor(
         private val DATE_FORMAT = stringPreferencesKey("date_format")
         private val LAST_SYNCED_AT = longPreferencesKey("last_synced_at")
         private val LAST_SYNCED_SHAS = stringPreferencesKey("last_synced_shas")
-        private val GITHUB_TOKEN = stringPreferencesKey("github_token")
+        private const val GITHUB_TOKEN_KEY = "github_token"
+    }
+
+    private val encryptedPrefs: SharedPreferences by lazy {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        EncryptedSharedPreferences.create(
+            "secure_prefs",
+            masterKeyAlias,
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    val githubToken: Flow<String> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == GITHUB_TOKEN_KEY) {
+                trySend(encryptedPrefs.getString(GITHUB_TOKEN_KEY, "") ?: "")
+            }
+        }
+        encryptedPrefs.registerOnSharedPreferenceChangeListener(listener)
+        send(encryptedPrefs.getString(GITHUB_TOKEN_KEY, "") ?: "")
+        awaitClose { encryptedPrefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
     val showMiniCalendar: Flow<Boolean> = context.dataStore.data
@@ -40,9 +69,6 @@ class SettingsRepository @Inject constructor(
 
     val controlsOnLeft: Flow<Boolean> = context.dataStore.data
         .map { it[CONTROLS_ON_LEFT] ?: false }
-
-    val githubToken: Flow<String> = context.dataStore.data
-        .map { it[GITHUB_TOKEN] ?: "" }
 
     val githubRepo: Flow<String> = context.dataStore.data
         .map { it[GITHUB_REPO] ?: "" }
@@ -88,7 +114,9 @@ class SettingsRepository @Inject constructor(
     }
 
     suspend fun setGitHubToken(token: String) {
-        context.dataStore.edit { it[GITHUB_TOKEN] = token }
+        withContext(Dispatchers.IO) {
+            encryptedPrefs.edit().putString(GITHUB_TOKEN_KEY, token).apply()
+        }
     }
 
     suspend fun setGitHubRepo(repo: String) {

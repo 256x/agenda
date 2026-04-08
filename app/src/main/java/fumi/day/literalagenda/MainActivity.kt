@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import fumi.day.literalagenda.data.GitHubRepository
-import fumi.day.literalagenda.data.EventRepository
 import fumi.day.literalagenda.data.SettingsRepository
 import fumi.day.literalagenda.ui.AgendaNavigation
 import fumi.day.literalagenda.ui.theme.LiteralAgendaTheme
@@ -26,9 +25,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var gitHubRepository: GitHubRepository
-
-    @Inject
-    lateinit var eventRepository: EventRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
