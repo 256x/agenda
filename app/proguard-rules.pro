@@ -16,6 +16,9 @@
 # App data classes used by file parsing / JSON
 -keep class fumi.day.literalagenda.data.** { *; }
 
+# Suppress missing class warnings for error-prone annotations used by Tink (transitive dep)
+-dontwarn com.google.errorprone.annotations.**
+
 # Kotlin coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
