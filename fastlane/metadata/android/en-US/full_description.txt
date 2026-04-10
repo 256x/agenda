@@ -5,6 +5,7 @@ Do you really need Google Calendar for your personal life? Dentist appointments,
 Literal Agenda is for your private schedule. Simple, readable, yours.
 
 Features:
+
 - 'Literal' Input: Type 415 for April 15, 930 for 9:30. No calendar scrolling.
 - File-Based: Events are stored as plain .md files. No lock-in.
 - GitHub Sync: Sync to a private GitHub repository for cross-device access.
