@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fumi.day.literalagenda.data.Event
 import fumi.day.literalagenda.data.EventRepository
-import fumi.day.literalagenda.data.GitHubRepository
+import fumi.day.literalagenda.data.GitSyncRepository
 import fumi.day.literalagenda.data.RepeatType
 import fumi.day.literalagenda.data.SettingsRepository
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditViewModel @Inject constructor(
     private val eventRepository: EventRepository,
-    private val gitHubRepository: GitHubRepository,
+    private val gitHubRepository: GitSyncRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 

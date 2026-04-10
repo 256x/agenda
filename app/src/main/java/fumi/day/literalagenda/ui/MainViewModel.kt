@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fumi.day.literalagenda.data.Event
 import fumi.day.literalagenda.data.EventRepository
-import fumi.day.literalagenda.data.GitHubRepository
+import fumi.day.literalagenda.data.GitSyncRepository
 import fumi.day.literalagenda.data.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val eventRepository: EventRepository,
     private val settingsRepository: SettingsRepository,
-    private val gitHubRepository: GitHubRepository
+    private val gitHubRepository: GitSyncRepository
 ) : ViewModel() {
 
     val events: Flow<List<Event>> = eventRepository.getUpcomingEvents()

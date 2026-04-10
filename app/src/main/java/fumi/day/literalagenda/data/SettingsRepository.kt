@@ -31,6 +31,8 @@ class SettingsRepository @Inject constructor(
         private val SHOW_MINI_CALENDAR = booleanPreferencesKey("show_mini_calendar")
         private val CONTROLS_ON_LEFT = booleanPreferencesKey("controls_on_left")
         private val GITHUB_REPO = stringPreferencesKey("github_repo")
+        private val GIT_FORGE = stringPreferencesKey("git_forge")
+        private val GIT_HOST = stringPreferencesKey("git_host")
         private val BG_COLOR = stringPreferencesKey("bg_color")
         private val TEXT_COLOR = stringPreferencesKey("text_color")
         private val ACCENT_COLOR = stringPreferencesKey("accent_color")
@@ -53,7 +55,7 @@ class SettingsRepository @Inject constructor(
         )
     }
 
-    val githubToken: Flow<String> = callbackFlow {
+    val gitToken: Flow<String> = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == GITHUB_TOKEN_KEY) {
                 trySend(encryptedPrefs.getString(GITHUB_TOKEN_KEY, "") ?: "")
@@ -70,8 +72,14 @@ class SettingsRepository @Inject constructor(
     val controlsOnLeft: Flow<Boolean> = context.dataStore.data
         .map { it[CONTROLS_ON_LEFT] ?: false }
 
-    val githubRepo: Flow<String> = context.dataStore.data
+    val gitRepo: Flow<String> = context.dataStore.data
         .map { it[GITHUB_REPO] ?: "" }
+
+    val gitForge: Flow<GitForge> = context.dataStore.data
+        .map { if (it[GIT_FORGE] == "gitea") GitForge.GITEA else GitForge.GITHUB }
+
+    val gitHost: Flow<String> = context.dataStore.data
+        .map { it[GIT_HOST] ?: "" }
 
     val bgColor: Flow<String> = context.dataStore.data
         .map { it[BG_COLOR] ?: "" }
@@ -113,14 +121,22 @@ class SettingsRepository @Inject constructor(
         context.dataStore.edit { it[CONTROLS_ON_LEFT] = left }
     }
 
-    suspend fun setGitHubToken(token: String) {
+    suspend fun setGitToken(token: String) {
         withContext(Dispatchers.IO) {
             encryptedPrefs.edit().putString(GITHUB_TOKEN_KEY, token).apply()
         }
     }
 
-    suspend fun setGitHubRepo(repo: String) {
+    suspend fun setGitRepo(repo: String) {
         context.dataStore.edit { it[GITHUB_REPO] = repo }
+    }
+
+    suspend fun setGitForge(forge: GitForge) {
+        context.dataStore.edit { it[GIT_FORGE] = forge.name.lowercase() }
+    }
+
+    suspend fun setGitHost(host: String) {
+        context.dataStore.edit { it[GIT_HOST] = host }
     }
 
     suspend fun setBgColor(color: String) {

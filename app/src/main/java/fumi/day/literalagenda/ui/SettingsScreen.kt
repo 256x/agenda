@@ -69,6 +69,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import fumi.day.literalagenda.data.GitForge
 import fumi.day.literalagenda.ui.theme.parseColor
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -86,8 +87,10 @@ fun SettingsScreen(
 ) {
     val scope = rememberCoroutineScope()
     val controlsOnLeft by viewModel.controlsOnLeft.collectAsState(initial = false)
-    val githubToken by viewModel.githubToken.collectAsState(initial = "")
-    val githubRepo by viewModel.githubRepo.collectAsState(initial = "")
+    val gitToken by viewModel.gitToken.collectAsState(initial = "")
+    val gitRepo by viewModel.gitRepo.collectAsState(initial = "")
+    val gitForge by viewModel.gitForge.collectAsState(initial = GitForge.GITHUB)
+    val gitHost by viewModel.gitHost.collectAsState(initial = "")
     val bgColor by viewModel.bgColor.collectAsState(initial = "")
     val textColor by viewModel.textColor.collectAsState(initial = "")
     val accentColor by viewModel.accentColor.collectAsState(initial = "")
@@ -99,7 +102,7 @@ fun SettingsScreen(
     val isImporting by viewModel.isImporting.collectAsState()
     val importResult by viewModel.importResult.collectAsState()
 
-    var showGitHubDialog by remember { mutableStateOf(false) }
+    var showGitDialog by remember { mutableStateOf(false) }
     var showColorPicker by remember { mutableStateOf<ColorPickerTarget?>(null) }
 
     val fontOptions = listOf("system", "serif", "mono", "scopeone")
@@ -117,7 +120,8 @@ fun SettingsScreen(
         "dmw" to "15/04 Tue"
     )
 
-    val isGitHubConnected = githubToken.isNotBlank() && githubRepo.isNotBlank()
+    val isGitConnected = gitToken.isNotBlank() && gitRepo.isNotBlank() &&
+        (gitForge == GitForge.GITHUB || gitHost.isNotBlank())
 
     LaunchedEffect(syncError) {
         syncError?.let { viewModel.clearSyncError() }
@@ -248,21 +252,26 @@ fun SettingsScreen(
                 }
             }
 
-            // GitHub Sync card
+            // Git Sync card
             Card(
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text("GitHub Sync", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Git Sync", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(12.dp))
-                    if (isGitHubConnected) {
+                    if (isGitConnected) {
+                        Text(
+                            text = if (gitForge == GitForge.GITEA) "Gitea / Forgejo" else "GitHub",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(githubRepo, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            Text(gitRepo, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                             IconButton(onClick = { scope.launch { viewModel.syncNow() } }, enabled = !isSyncing) {
                                 Icon(Icons.Default.Refresh, contentDescription = "Sync Now")
                             }
@@ -271,11 +280,11 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
-                            OutlinedButton(onClick = { showGitHubDialog = true }, enabled = !isSyncing) {
+                            OutlinedButton(onClick = { showGitDialog = true }, enabled = !isSyncing) {
                                 Text("Edit")
                             }
                             OutlinedButton(
-                                onClick = { scope.launch { viewModel.setGitHubToken(""); viewModel.setGitHubRepo("") } },
+                                onClick = { scope.launch { viewModel.setGitToken(""); viewModel.setGitRepo("") } },
                                 enabled = !isSyncing
                             ) {
                                 Text("Disconnect")
@@ -283,11 +292,11 @@ fun SettingsScreen(
                         }
                     } else {
                         OutlinedButton(
-                            onClick = { showGitHubDialog = true },
+                            onClick = { showGitDialog = true },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !isSyncing
                         ) {
-                            Text("Connect GitHub")
+                            Text("Connect")
                         }
                     }
                 }
@@ -370,15 +379,41 @@ fun SettingsScreen(
         )
     }
 
-    // GitHub dialog
-    if (showGitHubDialog) {
-        var tokenInput by remember { mutableStateOf(githubToken) }
-        var repoInput by remember { mutableStateOf(githubRepo) }
+    // Git dialog
+    if (showGitDialog) {
+        var forgeInput by remember { mutableStateOf(gitForge) }
+        var hostInput by remember { mutableStateOf(gitHost) }
+        var tokenInput by remember { mutableStateOf(gitToken) }
+        var repoInput by remember { mutableStateOf(gitRepo) }
         AlertDialog(
-            onDismissRequest = { if (!isSyncing) showGitHubDialog = false },
-            title = { Text("GitHub Settings") },
+            onDismissRequest = { if (!isSyncing) showGitDialog = false },
+            title = { Text("Git Sync") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = forgeInput == GitForge.GITHUB,
+                            onClick = { forgeInput = GitForge.GITHUB },
+                            label = { Text("GitHub") },
+                            enabled = !isSyncing
+                        )
+                        FilterChip(
+                            selected = forgeInput == GitForge.GITEA,
+                            onClick = { forgeInput = GitForge.GITEA },
+                            label = { Text("Gitea / Forgejo") },
+                            enabled = !isSyncing
+                        )
+                    }
+                    if (forgeInput == GitForge.GITEA) {
+                        OutlinedTextField(
+                            value = hostInput,
+                            onValueChange = { hostInput = it },
+                            label = { Text("Host (e.g. https://codeberg.org)") },
+                            singleLine = true,
+                            enabled = !isSyncing,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                     OutlinedTextField(
                         value = tokenInput,
                         onValueChange = { tokenInput = it },
@@ -405,20 +440,21 @@ fun SettingsScreen(
             },
             confirmButton = {
                 val repoValid = repoInput.matches(Regex("^[^/]+/[^/]+$"))
+                val hostValid = forgeInput == GitForge.GITHUB || hostInput.isNotBlank()
                 TextButton(
                     onClick = {
                         scope.launch {
-                            val success = viewModel.connectGitHub(tokenInput, repoInput)
-                            if (success) showGitHubDialog = false
+                            val success = viewModel.connectGit(forgeInput, hostInput, tokenInput, repoInput)
+                            if (success) showGitDialog = false
                         }
                     },
-                    enabled = !isSyncing && tokenInput.isNotBlank() && repoValid
+                    enabled = !isSyncing && tokenInput.isNotBlank() && repoValid && hostValid
                 ) {
                     Text("Connect")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showGitHubDialog = false }, enabled = !isSyncing) {
+                TextButton(onClick = { showGitDialog = false }, enabled = !isSyncing) {
                     Text("Cancel")
                 }
             }

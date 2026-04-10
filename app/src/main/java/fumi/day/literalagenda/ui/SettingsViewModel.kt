@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fumi.day.literalagenda.data.EventRepository
-import fumi.day.literalagenda.data.GitHubRepository
+import fumi.day.literalagenda.data.GitForge
+import fumi.day.literalagenda.data.GitSyncRepository
 import fumi.day.literalagenda.data.SettingsRepository
 import fumi.day.literalagenda.data.SyncResult
 import kotlinx.coroutines.flow.Flow
@@ -17,13 +18,15 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val gitHubRepository: GitHubRepository,
+    private val gitSyncRepository: GitSyncRepository,
     private val eventRepository: EventRepository
 ) : ViewModel() {
 
     val controlsOnLeft: Flow<Boolean> = settingsRepository.controlsOnLeft
-    val githubToken: Flow<String> = settingsRepository.githubToken
-    val githubRepo: Flow<String> = settingsRepository.githubRepo
+    val gitToken: Flow<String> = settingsRepository.gitToken
+    val gitRepo: Flow<String> = settingsRepository.gitRepo
+    val gitForge: Flow<GitForge> = settingsRepository.gitForge
+    val gitHost: Flow<String> = settingsRepository.gitHost
     val bgColor: Flow<String> = settingsRepository.bgColor
     val textColor: Flow<String> = settingsRepository.textColor
     val accentColor: Flow<String> = settingsRepository.accentColor
@@ -44,8 +47,10 @@ class SettingsViewModel @Inject constructor(
     val importResult: StateFlow<Int?> = _importResult
 
     suspend fun setControlsOnLeft(left: Boolean) = settingsRepository.setControlsOnLeft(left)
-    suspend fun setGitHubToken(token: String) = settingsRepository.setGitHubToken(token)
-    suspend fun setGitHubRepo(repo: String) = settingsRepository.setGitHubRepo(repo)
+    suspend fun setGitToken(token: String) = settingsRepository.setGitToken(token)
+    suspend fun setGitRepo(repo: String) = settingsRepository.setGitRepo(repo)
+    suspend fun setGitForge(forge: GitForge) = settingsRepository.setGitForge(forge)
+    suspend fun setGitHost(host: String) = settingsRepository.setGitHost(host)
     suspend fun setBgColor(color: String) = settingsRepository.setBgColor(color)
     suspend fun setTextColor(color: String) = settingsRepository.setTextColor(color)
     suspend fun setAccentColor(color: String) = settingsRepository.setAccentColor(color)
@@ -58,14 +63,14 @@ class SettingsViewModel @Inject constructor(
         _isSyncing.value = true
         _syncError.value = null
         return try {
-            val result = gitHubRepository.sync()
+            val result = gitSyncRepository.sync()
             when (result) {
                 is SyncResult.Success -> {
                     eventRepository.loadEvents()
                     true
                 }
                 is SyncResult.NotConfigured -> {
-                    _syncError.value = "GitHub not configured"
+                    _syncError.value = "Git sync not configured"
                     false
                 }
                 is SyncResult.Error -> {
@@ -78,9 +83,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun connectGitHub(token: String, repo: String): Boolean {
-        setGitHubToken(token)
-        setGitHubRepo(repo)
+    suspend fun connectGit(forge: GitForge, host: String, token: String, repo: String): Boolean {
+        setGitForge(forge)
+        setGitHost(host)
+        setGitToken(token)
+        setGitRepo(repo)
         return syncNow()
     }
 
@@ -99,7 +106,7 @@ class SettingsViewModel @Inject constructor(
             try {
                 val count = eventRepository.importFromICal(inputStream)
                 if (count > 0) {
-                    gitHubRepository.sync()
+                    gitSyncRepository.sync()
                 }
                 _importResult.value = count
             } finally {

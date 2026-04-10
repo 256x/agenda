@@ -10,7 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import fumi.day.literalagenda.data.GitHubRepository
+import fumi.day.literalagenda.data.GitSyncRepository
 import fumi.day.literalagenda.data.SettingsRepository
 import fumi.day.literalagenda.ui.AgendaNavigation
 import fumi.day.literalagenda.ui.theme.LiteralAgendaTheme
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
     lateinit var settingsRepository: SettingsRepository
 
     @Inject
-    lateinit var gitHubRepository: GitHubRepository
+    lateinit var gitHubRepository: GitSyncRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
