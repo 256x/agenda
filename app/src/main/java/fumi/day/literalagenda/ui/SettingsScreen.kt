@@ -321,7 +321,7 @@ fun SettingsScreen(
             }
 
             Text(
-                text = "Literal Agenda v1.0.0",
+                text = "Literal Agenda v1.1.0",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
