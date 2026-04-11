@@ -91,11 +91,11 @@ If a feature requires explaining in multiple steps, it probably doesn't belong h
 
 ## Development
 
-Built with Kotlin and Jetpack Compose.
-
 - Kotlin / Jetpack Compose
 - Target: Android 8.0+
 - No Google APIs. No Firebase. No tracking.
+
+This app was built with substantial assistance from [Claude](https://claude.ai) (Anthropic). AI was involved throughout development, including writing code.
 
 ## License
 
