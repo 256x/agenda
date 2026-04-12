@@ -97,6 +97,18 @@ If a feature requires explaining in multiple steps, it probably doesn't belong h
 
 This app was built with substantial assistance from [Claude](https://claude.ai) (Anthropic). AI was involved throughout development, including writing code.
 
+## PC Scripts
+
+The `scripts/` directory has a few extras for terminal and editor use:
+
+- `new-event.sh` — create a new event from terminal (prompts for date, time, repeat)
+- `search-event.sh` — search events with fzf
+- `sync-agenda.sh` — sync events with remote repository
+- `literalagenda.vim` — Vim integration (new / list / search)
+- `literalagenda.lua` — Neovim integration via fzf-lua
+
+See [User Guide](./docs/USER_GUIDE.md) for details.
+
 ## License
 
 MIT
