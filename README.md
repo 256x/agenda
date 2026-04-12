@@ -40,13 +40,13 @@ Literal Agenda is built around a simple observation:
 
 No shared calendars. No meeting invites. No integrations.
 
-Just your events, stored as plain text files, synced through a private GitHub repository you control.
+Just your events, stored as plain text files, synced through a private Git repository you control.
 
 ## Features
 
 - **'Literal' input**: type `15` for (current month) 15, `415` for April 15, `930` for 9:30
 - **Mini calendar**: Optional month view with event indicators
-- **Sync**: GitHub sync to keep events across devices
+- **Sync**: Git sync (GitHub, Gitea/Forgejo, Codeberg) to keep events across devices
 - **Import**: Import from any iCal-compatible calendar app (.ics)
 - **Repeat**: Weekly, monthly, and yearly repeat support
 - **Search**: Filter events by title or note
@@ -71,7 +71,7 @@ This app may appeal to people who:
 
 - want to separate private and work schedules
 - prefer plain text over cloud-managed data
-- are comfortable with GitHub as a sync backend
+- are comfortable with Git-based sync
 - find mainstream calendar apps overwhelming for personal use
 - migrated from Google Calendar and never looked back
 
