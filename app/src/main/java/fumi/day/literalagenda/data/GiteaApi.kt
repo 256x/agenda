@@ -75,7 +75,9 @@ class GiteaApi(host: String) : GitForgeApi {
                 put("content", encoded)
                 if (sha != null) put("sha", sha)
             }
-            val (code, body) = request("PUT", "$baseUrl/repos/$repo/contents/$path", token, bodyObj.toString())
+            // Forgejo/Gitea: POST to create, PUT to update
+            val method = if (sha == null) "POST" else "PUT"
+            val (code, body) = request(method, "$baseUrl/repos/$repo/contents/$path", token, bodyObj.toString())
             if (code == 200 || code == 201) JSONObject(body).getJSONObject("content").getString("sha") else null
         } catch (e: Exception) {
             null
