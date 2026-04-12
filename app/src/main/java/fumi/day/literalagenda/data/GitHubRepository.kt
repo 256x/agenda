@@ -50,6 +50,11 @@ class GitSyncRepository @Inject constructor(
         _syncError.value = null
     }
 
+    fun clearLocalData() {
+        eventsDir.listFiles()?.forEach { it.delete() }
+        repeatingDir.listFiles()?.forEach { it.delete() }
+    }
+
     private val eventsDir: File
         get() = File(context.filesDir, "events").also { it.mkdirs() }
 

@@ -385,6 +385,9 @@ fun SettingsScreen(
         var hostInput by remember { mutableStateOf(gitHost) }
         var tokenInput by remember { mutableStateOf(gitToken) }
         var repoInput by remember { mutableStateOf(gitRepo) }
+        val repoWillChange = isGitConnected && (
+            forgeInput != gitForge || hostInput != gitHost || repoInput != gitRepo
+        )
         AlertDialog(
             onDismissRequest = { if (!isSyncing) showGitDialog = false },
             title = { Text("Git Sync") },
@@ -436,6 +439,13 @@ fun SettingsScreen(
                         enabled = !isSyncing,
                         modifier = Modifier.fillMaxWidth()
                     )
+                    if (repoWillChange) {
+                        Text(
+                            text = "Switching repositories will remove all local data. It will be re-synced from the new repository.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             },
             confirmButton = {

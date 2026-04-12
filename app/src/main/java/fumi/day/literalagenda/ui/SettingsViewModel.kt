@@ -11,6 +11,7 @@ import fumi.day.literalagenda.data.SyncResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.InputStream
 import javax.inject.Inject
@@ -84,6 +85,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     suspend fun connectGit(forge: GitForge, host: String, token: String, repo: String): Boolean {
+        val currentForge = settingsRepository.gitForge.first()
+        val currentHost = settingsRepository.gitHost.first()
+        val currentRepo = settingsRepository.gitRepo.first()
+        val repoChanged = currentRepo.isNotBlank() &&
+            (forge != currentForge || host != currentHost || repo != currentRepo)
+
+        if (repoChanged) {
+            gitSyncRepository.clearLocalData()
+            settingsRepository.setLastSyncedAt(0L)
+            settingsRepository.setLastSyncedShas(emptyMap())
+        }
+
         setGitForge(forge)
         setGitHost(host)
         setGitToken(token)
