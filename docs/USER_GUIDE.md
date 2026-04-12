@@ -6,7 +6,7 @@ Literal Agenda is a minimalist personal agenda app.
 
 **Philosophy**: Your schedule, not theirs.
 
-No shared calendars. No meeting invites. Just your events, stored as plain text, synced through a private GitHub repository.
+No shared calendars. No meeting invites. Just your events, stored as plain text, synced through a private Git repository.
 
 ---
 
@@ -84,16 +84,26 @@ When creating or editing an event, you can set a repeat type:
 
 ---
 
-## GitHub Sync
+## Git Sync
 
-### Setup
+Supports **GitHub**, **Gitea/Forgejo** (including Codeberg), and any compatible Git forge.
+
+### Setup (GitHub)
 
 1. Create a **private** repository on GitHub (e.g., `username/agenda`)
 2. Create a Personal Access Token:
    - Go to GitHub → Settings → Developer settings → Personal access tokens
    - Generate a token with `repo` scope
 3. In Literal Agenda, go to **Settings**
-4. Enter your token and repository (format: `username/repo`)
+4. Select **GitHub**, enter your token and repository (format: `username/repo`)
+5. Tap **Connect**
+
+### Setup (Gitea / Forgejo / Codeberg)
+
+1. Create a **private** repository on your Gitea/Forgejo instance (e.g., Codeberg)
+2. Create an access token in your account settings
+3. In Literal Agenda, go to **Settings**
+4. Select **Gitea/Forgejo**, enter the host URL (e.g., `codeberg.org`), token, and repository
 5. Tap **Connect**
 
 ### How Sync Works
@@ -102,15 +112,19 @@ When creating or editing an event, you can set a repeat type:
 - Manual sync available via the sync icon in the top bar
 - Each event is stored as a plain text file in your repository
 
+### Switching Repositories
+
+If you change the forge, host, or repository, all local data is cleared on the next sync. The app will then download everything from the new repository. A warning is shown before this happens.
+
 ### Deleted Events
 
-When you delete an event, it is moved to a `trash/` folder in your GitHub repository instead of being permanently deleted. The app never reads from `trash/` — it is purely a safety net on the GitHub side.
+When you delete an event, it is moved to a `trash/` folder in your repository instead of being permanently deleted. The app never reads from `trash/` — it is purely a safety net on the remote side.
 
-To permanently delete trashed events, remove the files from `trash/` directly in GitHub (or in a local clone) and sync.
+To permanently delete trashed events, remove the files from `trash/` directly in your repository and sync.
 
 ### Multi-device Usage
 
-1. Set up GitHub Sync on all devices using the same repository
+1. Set up Git Sync on all devices using the same repository
 2. Let the app sync before editing
 3. Avoid editing the same event on two devices simultaneously
 
@@ -151,7 +165,7 @@ Imported events will appear in your list immediately.
 | Date format | Order of day, month, weekday |
 | Colors | Background, text, accent |
 | Controls on left | Moves action buttons (FAB) to left side on all screens |
-| GitHub Sync | Connect your private repository |
+| Git Sync | Connect your private repository (GitHub, Gitea/Forgejo, Codeberg) |
 | Import | Import from iCal (.ics) |
 
 ---
@@ -161,17 +175,18 @@ Imported events will appear in your list immediately.
 ### Sync not working?
 
 - Check your internet connection
-- Verify your token has `repo` scope
+- Verify your token has the required scope (`repo` for GitHub, appropriate permissions for Gitea/Forgejo)
 - Make sure the repository exists
+- For Gitea/Forgejo, verify the host URL is correct
 - Try reconnecting in Settings
 
 ### Events not appearing on another device?
 
 - Wait a few seconds after launch for sync to complete
-- Check if the files exist in your GitHub repository
+- Check if the files exist in your repository
 - Tap the sync icon to trigger a manual sync
 
 ### Lost an event?
 
-Deleted events are moved to the `trash/` folder in your GitHub repository. To restore one, move the file from `trash/` back to `events/` (or `repeating/` for repeating events) directly in GitHub, then sync the app.
+Deleted events are moved to the `trash/` folder in your repository. To restore one, move the file from `trash/` back to `events/` (or `repeating/` for repeating events) directly in your repository, then sync the app.
 
