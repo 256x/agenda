@@ -47,6 +47,8 @@ private val _events = MutableStateFlow<List<Event>>(emptyList())
         }
     }
 
+    fun getAllEvents(): Flow<List<Event>> = _events
+
     fun getUpcomingEvents(months: Int = 3): Flow<List<Event>> {
         val today = LocalDate.now()
         val endDate = today.plusMonths(months.toLong())

@@ -25,6 +25,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val events: Flow<List<Event>> = eventRepository.getUpcomingEvents()
+    val allEvents: Flow<List<Event>> = eventRepository.getAllEvents()
 
     private val _selectedEvent = MutableStateFlow<Event?>(null)
     val selectedEvent: StateFlow<Event?> = _selectedEvent

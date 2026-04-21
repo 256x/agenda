@@ -80,7 +80,9 @@ class GitSyncRepository @Inject constructor(
     suspend fun sync(): SyncResult {
         return withContext(Dispatchers.IO) {
             try {
-                val (api, token, repo) = resolveApi() ?: return@withContext SyncResult.NotConfigured
+                val resolved = resolveApi()
+                if (resolved == null) return@withContext SyncResult.NotConfigured
+                val (api, token, repo) = resolved
 
                 val lastSyncedAt = settingsRepository.lastSyncedAt.first()
                 val lastSyncedShas = settingsRepository.lastSyncedShas.first()
@@ -111,7 +113,6 @@ class GitSyncRepository @Inject constructor(
     ) {
         val remoteFiles = api.listFiles(token, repo, remotePath)
         val remoteFileMap = remoteFiles.associateBy { it.name }
-        remoteFiles.forEach { newShas["$remotePath/${it.name}"] = it.sha }
 
         val localFiles = localDir.listFiles()?.filter { it.extension == "md" } ?: emptyList()
         val localFileMap = localFiles.associateBy { it.name }
@@ -128,7 +129,6 @@ class GitSyncRepository @Inject constructor(
                     if (knownSha != null) {
                         // Previously synced, now gone from remote → delete locally
                         localFile.delete()
-                        newShas.remove("$remotePath/$fileName")
                     } else {
                         // New local file → upload
                         val content = localFile.readText(Charsets.UTF_8)
@@ -141,12 +141,12 @@ class GitSyncRepository @Inject constructor(
                     if (knownSha != null) {
                         // Previously synced, now deleted locally → delete from remote
                         api.deleteFile(token, repo, "$remotePath/$fileName", remoteFile.sha)
-                        newShas.remove("$remotePath/$fileName")
                     } else {
                         // New remote file → download
                         val content = api.getFileContent(token, repo, remoteFile.path)
                         if (content != null) {
                             File(localDir, fileName).writeText(content, Charsets.UTF_8)
+                            newShas["$remotePath/$fileName"] = remoteFile.sha
                         }
                     }
                 }
@@ -159,21 +159,32 @@ class GitSyncRepository @Inject constructor(
                         knownSha == null -> {
                             // First sync with both sides present: remote wins
                             val remoteContent = api.getFileContent(token, repo, remoteFile.path)
-                            if (remoteContent != null && remoteContent != localFile.readText(Charsets.UTF_8)) {
-                                localFile.writeText(remoteContent, Charsets.UTF_8)
+                            if (remoteContent != null) {
+                                if (remoteContent != localFile.readText(Charsets.UTF_8)) {
+                                    localFile.writeText(remoteContent, Charsets.UTF_8)
+                                }
+                                newShas["$remotePath/$fileName"] = remoteFile.sha
                             }
                         }
-                        !localChanged && !remoteChanged -> { /* in sync, nothing to do */ }
+                        !localChanged && !remoteChanged -> {
+                            newShas["$remotePath/$fileName"] = remoteFile.sha
+                        }
                         localChanged && !remoteChanged -> {
                             // Only local changed → upload
                             val content = localFile.readText(Charsets.UTF_8)
                             val newSha = api.putFile(token, repo, "$remotePath/$fileName", content, remoteFile.sha)
                             if (newSha != null) newShas["$remotePath/$fileName"] = newSha
+                            else newShas["$remotePath/$fileName"] = remoteFile.sha
                         }
                         !localChanged && remoteChanged -> {
                             // Only remote changed → download
                             val content = api.getFileContent(token, repo, remoteFile.path)
-                            if (content != null) localFile.writeText(content, Charsets.UTF_8)
+                            if (content != null) {
+                                localFile.writeText(content, Charsets.UTF_8)
+                                newShas["$remotePath/$fileName"] = remoteFile.sha
+                            } else {
+                                newShas["$remotePath/$fileName"] = knownSha
+                            }
                         }
                         else -> {
                             // Both changed → conflict: save local copy, download remote
@@ -184,6 +195,9 @@ class GitSyncRepository @Inject constructor(
                                 val conflictName = fileName.removeSuffix(".md") + "_conflict_$timestamp.md"
                                 File(localDir, conflictName).writeText(localContent, Charsets.UTF_8)
                                 localFile.writeText(remoteContent, Charsets.UTF_8)
+                                newShas["$remotePath/$fileName"] = remoteFile.sha
+                            } else {
+                                newShas["$remotePath/$fileName"] = knownSha
                             }
                         }
                     }

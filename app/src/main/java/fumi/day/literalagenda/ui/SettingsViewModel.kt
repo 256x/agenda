@@ -99,8 +99,8 @@ class SettingsViewModel @Inject constructor(
 
         setGitForge(forge)
         setGitHost(host)
-        setGitToken(token)
-        setGitRepo(repo)
+        setGitToken(token.trim())
+        setGitRepo(repo.trim())
         return syncNow()
     }
 

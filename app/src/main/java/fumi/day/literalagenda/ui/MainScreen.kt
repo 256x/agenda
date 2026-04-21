@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
@@ -78,6 +79,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val events by viewModel.events.collectAsState(initial = emptyList())
+    val allEvents by viewModel.allEvents.collectAsState(initial = emptyList())
     val showMiniCalendar by viewModel.showMiniCalendar.collectAsState(initial = false)
     val controlsOnLeft by viewModel.controlsOnLeft.collectAsState(initial = false)
     val dateFormat by viewModel.dateFormat.collectAsState(initial = "wmd")
@@ -98,7 +100,7 @@ fun MainScreen(
 
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val eventsOnSelectedDate = selectedDate?.let { date ->
-        events.filter { it.date == date }
+        allEvents.filter { it.date == date }
     } ?: emptyList()
 
     val displayedEvents = if (searchQuery.isBlank()) {
@@ -110,8 +112,8 @@ fun MainScreen(
         }
     }
 
-    val eventDates = remember(events) {
-        events.map { it.date }.toSet()
+    val eventDates = remember(allEvents) {
+        allEvents.map { it.date }.toSet()
     }
 
 
@@ -256,11 +258,21 @@ fun MainScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { selectedDate = null; onNavigateToEdit(event) }
                                 .padding(vertical = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            IconButton(
+                                onClick = { selectedDate = null; onNavigateToEdit(event) },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                             event.time?.let { time ->
                                 Text(
                                     text = time.format(timeFormatter),
