@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(keytool:*)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(ANDROID_HOME=/mnt/c/Users/fumi/AppData/Local/Android/Sdk ./gradlew assembleDebug)",
+      "Bash(convert /mnt/c/Users/fumi/AndroidStudioProjects/LiteralAgenda/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp /mnt/c/Users/fumi/AndroidStudioProjects/LiteralAgenda/fastlane/metadata/android/en-US/images/icon.png)",
+      "Bash(identify /mnt/c/Users/fumi/AndroidStudioProjects/LiteralAgenda/fastlane/metadata/android/en-US/images/icon.png)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git tag:*)"
+    ]
+  }
+}

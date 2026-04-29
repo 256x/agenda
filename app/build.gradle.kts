@@ -25,7 +25,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("C:/Users/fumi/Documents/AndroidKeys/literal-agenda.jks")
+            storeFile = file("/home/fumi/Documents/AndroidKeys/literal-agenda.jks")
             storePassword = localProperties["STORE_PASSWORD"].toString()
             keyAlias = localProperties["KEY_ALIAS"].toString()
             keyPassword = localProperties["KEY_PASSWORD"].toString()
