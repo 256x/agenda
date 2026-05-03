@@ -64,6 +64,8 @@ Time is optional. Leave it blank for all-day events.
 
 Type in the search bar at the bottom of the main screen to filter events by title or note. Press Enter (Search) to apply. Press Back to clear the search.
 
+Search covers **all events including past ones** — useful for looking up when something last happened.
+
 ---
 
 ## Mini Calendar
@@ -71,7 +73,7 @@ Type in the search bar at the bottom of the main screen to filter events by titl
 Tap the calendar icon in the top bar to toggle the mini calendar.
 
 - Dates with events are highlighted
-- Tap a date to see its events
+- Tap a date to see its events — including past dates
 - Tap an event in the popup to open it
 
 ---

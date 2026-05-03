@@ -49,7 +49,7 @@ Just your events, stored as plain text files, synced through a private Git repos
 - **Sync**: Git sync (GitHub, Gitea/Forgejo, Codeberg) to keep events across devices
 - **Import**: Import from any iCal-compatible calendar app (.ics)
 - **Repeat**: Weekly, monthly, and yearly repeat support
-- **Search**: Filter events by title or note
+- **Search**: Full-text search across all events, including past ones
 - **Customize**: Font, size, accent color, controls on left
 
 ## How it works

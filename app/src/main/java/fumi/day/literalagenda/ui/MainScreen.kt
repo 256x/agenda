@@ -106,7 +106,7 @@ fun MainScreen(
     val displayedEvents = if (searchQuery.isBlank()) {
         events
     } else {
-        events.filter {
+        allEvents.filter {
             it.title.contains(searchQuery, ignoreCase = true) ||
                     it.note.contains(searchQuery, ignoreCase = true)
         }

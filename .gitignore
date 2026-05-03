@@ -13,4 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+docs/PLAY_STORE.md
+docs/play_store_assets/
 
