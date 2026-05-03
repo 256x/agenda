@@ -23,6 +23,10 @@ android {
         includeInBundle = false
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file("/home/fumi/Documents/AndroidKeys/literal-agenda.jks")
