@@ -167,6 +167,7 @@ Imported events will appear in your list immediately.
 | Date format | Order of day, month, weekday |
 | Colors | Background, text, accent |
 | Controls on left | Moves action buttons (FAB) to left side on all screens |
+| Search range | Set past and future date range for search (Today / 1mo / 3mo / 1yr / All) |
 | Git Sync | Connect your private repository (GitHub, Gitea/Forgejo, Codeberg) |
 | Import | Import from iCal (.ics) |
 
