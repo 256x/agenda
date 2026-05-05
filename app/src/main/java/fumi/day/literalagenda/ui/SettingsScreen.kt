@@ -97,6 +97,8 @@ fun SettingsScreen(
     val fontChoice by viewModel.fontChoice.collectAsState(initial = "system")
     val fontSize by viewModel.fontSize.collectAsState(initial = 16f)
     val dateFormat by viewModel.dateFormat.collectAsState(initial = "wmd")
+    val pastMonths by viewModel.pastMonths.collectAsState(initial = 1)
+    val futureMonths by viewModel.futureMonths.collectAsState(initial = 3)
     val isSyncing by viewModel.isSyncing.collectAsState()
     val syncError by viewModel.syncError.collectAsState()
     val isImporting by viewModel.isImporting.collectAsState()
@@ -248,6 +250,38 @@ fun SettingsScreen(
                             checked = controlsOnLeft,
                             onCheckedChange = { scope.launch { viewModel.setControlsOnLeft(it) } }
                         )
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                    Text("Search range", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Past", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(0 to "Today", 1 to "1 mo", 3 to "3 mo", 12 to "1 yr", -1 to "All").forEach { (months, label) ->
+                            FilterChip(
+                                selected = pastMonths == months,
+                                onClick = { scope.launch { viewModel.setPastMonths(months) } },
+                                label = { Text(label) }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Future", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(1 to "1 mo", 3 to "3 mo", 6 to "6 mo", 12 to "1 yr", -1 to "All").forEach { (months, label) ->
+                            FilterChip(
+                                selected = futureMonths == months,
+                                onClick = { scope.launch { viewModel.setFutureMonths(months) } },
+                                label = { Text(label) }
+                            )
+                        }
                     }
                 }
             }

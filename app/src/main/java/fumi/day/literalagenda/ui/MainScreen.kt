@@ -30,8 +30,11 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -71,7 +74,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.activity.compose.BackHandler
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
@@ -80,6 +83,8 @@ fun MainScreen(
 ) {
     val events by viewModel.events.collectAsState(initial = emptyList())
     val allEvents by viewModel.allEvents.collectAsState(initial = emptyList())
+    val pastMonths by viewModel.pastMonths.collectAsState()
+    val futureMonths by viewModel.futureMonths.collectAsState()
     val showMiniCalendar by viewModel.showMiniCalendar.collectAsState(initial = false)
     val controlsOnLeft by viewModel.controlsOnLeft.collectAsState(initial = false)
     val dateFormat by viewModel.dateFormat.collectAsState(initial = "wmd")
@@ -106,9 +111,13 @@ fun MainScreen(
     val displayedEvents = if (searchQuery.isBlank()) {
         events
     } else {
-        allEvents.filter {
-            it.title.contains(searchQuery, ignoreCase = true) ||
-                    it.note.contains(searchQuery, ignoreCase = true)
+        val today = LocalDate.now()
+        val startDate = if (pastMonths == -1) LocalDate.MIN else today.minusMonths(pastMonths.toLong())
+        val endDate = if (futureMonths == -1) today.plusYears(5) else today.plusMonths(futureMonths.toLong())
+        allEvents.filter { event ->
+            !event.date.isBefore(startDate) && !event.date.isAfter(endDate) &&
+            (event.title.contains(searchQuery, ignoreCase = true) ||
+             event.note.contains(searchQuery, ignoreCase = true))
         }
     }
 
@@ -172,6 +181,30 @@ fun MainScreen(
                 containerColor = Color.Transparent,
                 modifier = Modifier.imePadding()
             ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                if (searchInput.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
+                        listOf(0 to "Today", 1 to "1mo", 3 to "3mo", 12 to "1yr", -1 to "All").forEach { (m, label) ->
+                            FilterChip(
+                                selected = pastMonths == m,
+                                onClick = { viewModel.setPastMonths(m) },
+                                label = { Text(label, fontSize = 11.sp) }
+                            )
+                        }
+                        Text("→", modifier = Modifier.align(Alignment.CenterVertically), fontSize = 11.sp)
+                        listOf(1 to "1mo", 3 to "3mo", 6 to "6mo", 12 to "1yr", -1 to "All").forEach { (m, label) ->
+                            FilterChip(
+                                selected = futureMonths == m,
+                                onClick = { viewModel.setFutureMonths(m) },
+                                label = { Text(label, fontSize = 11.sp) }
+                            )
+                        }
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -204,6 +237,7 @@ fun MainScreen(
                         }
                     )
                 }
+                } // Column
             }
         },
         floatingActionButtonPosition = if (controlsOnLeft) FabPosition.Start else FabPosition.End,

@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
@@ -48,54 +47,6 @@ private val _events = MutableStateFlow<List<Event>>(emptyList())
     }
 
     fun getAllEvents(): Flow<List<Event>> = _events
-
-    fun getUpcomingEvents(months: Int = 3): Flow<List<Event>> {
-        val today = LocalDate.now()
-        val endDate = today.plusMonths(months.toLong())
-
-        return _events.map { events ->
-            val expanded = mutableListOf<Event>()
-
-            events.forEach { event ->
-                when (event.repeat) {
-                    RepeatType.NONE -> {
-                        if (!event.date.isBefore(today) && !event.date.isAfter(endDate)) {
-                            expanded.add(event)
-                        }
-                    }
-                    RepeatType.WEEKLY -> {
-                        var d = event.date
-                        while (!d.isAfter(endDate)) {
-                            if (!d.isBefore(today)) {
-                                expanded.add(event.copy(date = d))
-                            }
-                            d = d.plusWeeks(1)
-                        }
-                    }
-                    RepeatType.MONTHLY -> {
-                        var d = event.date
-                        while (!d.isAfter(endDate)) {
-                            if (!d.isBefore(today)) {
-                                expanded.add(event.copy(date = d))
-                            }
-                            d = d.plusMonths(1)
-                        }
-                    }
-                    RepeatType.YEARLY -> {
-                        var d = event.date
-                        while (!d.isAfter(endDate)) {
-                            if (!d.isBefore(today)) {
-                                expanded.add(event.copy(date = d))
-                            }
-                            d = d.plusYears(1)
-                        }
-                    }
-                }
-            }
-
-            expanded.sortedWith(compareBy({ it.date }, { it.time }))
-        }
-    }
 
     suspend fun saveEvent(event: Event): Boolean {
         return withContext(Dispatchers.IO) {

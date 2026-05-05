@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -41,6 +42,8 @@ class SettingsRepository @Inject constructor(
         private val DATE_FORMAT = stringPreferencesKey("date_format")
         private val LAST_SYNCED_AT = longPreferencesKey("last_synced_at")
         private val LAST_SYNCED_SHAS = stringPreferencesKey("last_synced_shas")
+        private val PAST_MONTHS = intPreferencesKey("past_months")
+        private val FUTURE_MONTHS = intPreferencesKey("future_months")
         private const val GITHUB_TOKEN_KEY = "github_token"
     }
 
@@ -102,6 +105,12 @@ class SettingsRepository @Inject constructor(
     val lastSyncedAt: Flow<Long> = context.dataStore.data
         .map { it[LAST_SYNCED_AT] ?: 0L }
 
+    val pastMonths: Flow<Int> = context.dataStore.data
+        .map { it[PAST_MONTHS] ?: 1 }
+
+    val futureMonths: Flow<Int> = context.dataStore.data
+        .map { it[FUTURE_MONTHS] ?: 3 }
+
     val lastSyncedShas: Flow<Map<String, String>> = context.dataStore.data
         .map { prefs ->
             val json = prefs[LAST_SYNCED_SHAS] ?: return@map emptyMap()
@@ -161,6 +170,14 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setDateFormat(format: String) {
         context.dataStore.edit { it[DATE_FORMAT] = format }
+    }
+
+    suspend fun setPastMonths(months: Int) {
+        context.dataStore.edit { it[PAST_MONTHS] = months }
+    }
+
+    suspend fun setFutureMonths(months: Int) {
+        context.dataStore.edit { it[FUTURE_MONTHS] = months }
     }
 
     suspend fun setLastSyncedAt(time: Long) {

@@ -34,6 +34,8 @@ class SettingsViewModel @Inject constructor(
     val fontChoice: Flow<String> = settingsRepository.fontChoice
     val fontSize: Flow<Float> = settingsRepository.fontSize
     val dateFormat: Flow<String> = settingsRepository.dateFormat
+    val pastMonths: Flow<Int> = settingsRepository.pastMonths
+    val futureMonths: Flow<Int> = settingsRepository.futureMonths
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing: StateFlow<Boolean> = _isSyncing
@@ -58,6 +60,8 @@ class SettingsViewModel @Inject constructor(
     suspend fun setFontChoice(font: String) = settingsRepository.setFontChoice(font)
     suspend fun setFontSize(size: Float) = settingsRepository.setFontSize(size)
     suspend fun setDateFormat(format: String) = settingsRepository.setDateFormat(format)
+    suspend fun setPastMonths(months: Int) = settingsRepository.setPastMonths(months)
+    suspend fun setFutureMonths(months: Int) = settingsRepository.setFutureMonths(months)
 
     suspend fun syncNow(): Boolean {
         if (_isSyncing.value) return false
