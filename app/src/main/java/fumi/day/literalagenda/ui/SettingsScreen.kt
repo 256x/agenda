@@ -355,7 +355,7 @@ fun SettingsScreen(
             }
 
             Text(
-                text = "Literal Agenda v1.2.0",
+                text = "Literal Agenda v${fumi.day.literalagenda.BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
